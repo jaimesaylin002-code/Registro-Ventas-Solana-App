@@ -1,3 +1,11 @@
+## Entrega final — VentasChain
+
+**Autora:** Aylin Jaimes
+
+Proyecto guiado del Advanced Bootcamp de Solana, personalizado
+con un resumen de ventas y un buscador de clientes.
+
+[Consultar documentación, aportaciones propias y pruebas](programa/README.md)
 # Registro de Ventas · App
 
 ![Registro de Ventas · App — Solana, TypeScript y React](./images/banner-app.png)
