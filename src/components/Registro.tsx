@@ -99,8 +99,54 @@ export function Registro({ onCambio, onOcupado }: { onCambio: () => void; onOcup
       <p className="help">El nombre y la autoridad determinan la dirección del registro. Puedes consultar otra autoridad en modo lectura.</p>
       {errorLectura && <p className="notice error" role="alert">{errorLectura}</p>}
     </section>
-    <div className="workspace-grid">
-      <section className="panel customers-panel"><div className="panel-heading"><h3>Clientes y ventas</h3>{registro && <span className="count">{registro.clientes.length} clientes</span>}</div>
+    <section className="panel">
+      <div className="panel-heading">
+        <h3>Resumen de VentasChain</h3>
+        <span className="small-note">
+          {registro ? 'Datos consultados en Devnet' : 'Pendiente de consulta'}
+        </span>
+      </div>
+
+      <div className="registry-summary">
+        <div>
+          <span className="label">Clientes registrados</span>
+          <strong>{registro ? registro.clientes.length : '—'}</strong>
+        </div>
+
+        <div>
+          <span className="label">Ventas activas</span>
+          <strong>
+            {registro
+              ? registro.clientes.reduce(
+                  (total, cliente) => total + cliente.ventas.length,
+                  0
+                )
+              : '—'}
+          </strong>
+        </div>
+
+        <div>
+          <span className="label">Importe de ventas activas</span>
+          <strong>
+            {registro
+              ? registro.clientes
+                  .reduce(
+                    (total, cliente) =>
+                      total +
+                      cliente.ventas.reduce(
+                        (suma, venta) => suma + venta.monto,
+                        0
+                      ),
+                    0
+                  )
+                  .toLocaleString('es-MX') + ' ' + UNIDAD_MONTO
+              : '—'}
+          </strong>
+        </div>
+      </div>
+    </section>
+
+    <div className="workspace-grid">      <section className="panel customers-panel"><div className="panel-heading"><h3>Clientes y ventas</h3>{registro && <span className="count">{registro.clientes.length} clientes</span>}</div>
         {!registro ? <div className="empty-state"><span className="empty-symbol">◎</span><h4>{consultado ? 'El registro todavía no existe' : 'El negocio aparecerá aquí'}</h4><p>{consultado ? 'Comprueba el nombre y la autoridad, o crea un registro con tu wallet conectada.' : 'Consulta el registro para ver sus clientes y las ventas activas de cada uno.'}</p></div> : <>
           <div className="registry-summary"><div><span className="label">Negocio</span><strong>{registro.nombreNegocio}</strong></div><div><span className="label">Último ID asignado</span><strong>{registro.idCounter}</strong></div></div>
           <details className="technical-details"><summary>Dirección del registro</summary><code className="address">{registro.direccion}</code></details>
