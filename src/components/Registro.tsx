@@ -22,6 +22,7 @@ export function Registro({ onCambio, onOcupado }: { onCambio: () => void; onOcup
   const [negocio, setNegocio] = useState(NEGOCIO_INICIAL);
   const [autoridad, setAutoridad] = useState(walletDireccion);
   const [registro, setRegistro] = useState<RegistroUI | null>(null);
+  const [busquedaCliente, setBusquedaCliente] = useState('');
   const [consultado, setConsultado] = useState(false);
   const [leyendo, setLeyendo] = useState(false);
   const [errorLectura, setErrorLectura] = useState('');
@@ -147,10 +148,26 @@ export function Registro({ onCambio, onOcupado }: { onCambio: () => void; onOcup
     </section>
 
     <div className="workspace-grid">      <section className="panel customers-panel"><div className="panel-heading"><h3>Clientes y ventas</h3>{registro && <span className="count">{registro.clientes.length} clientes</span>}</div>
+            <label className="search-field">
+          Buscar cliente
+          <input
+            type="search"
+            value={busquedaCliente}
+            onChange={(e) => setBusquedaCliente(e.target.value)}
+            placeholder="Escribe el nombre del cliente..."
+            disabled={!registro || ocupado}
+          />
+        </label>
         {!registro ? <div className="empty-state"><span className="empty-symbol">◎</span><h4>{consultado ? 'El registro todavía no existe' : 'El negocio aparecerá aquí'}</h4><p>{consultado ? 'Comprueba el nombre y la autoridad, o crea un registro con tu wallet conectada.' : 'Consulta el registro para ver sus clientes y las ventas activas de cada uno.'}</p></div> : <>
           <div className="registry-summary"><div><span className="label">Negocio</span><strong>{registro.nombreNegocio}</strong></div><div><span className="label">Último ID asignado</span><strong>{registro.idCounter}</strong></div></div>
           <details className="technical-details"><summary>Dirección del registro</summary><code className="address">{registro.direccion}</code></details>
-          {registro.clientes.length === 0 ? <p className="empty-line">Todavía no hay clientes. Puedes crear el primero desde Operaciones.</p> : registro.clientes.map((cliente) => <article className="customer" key={cliente.direccion}>
+          {registro.clientes.length === 0 ? <p className="empty-line">Todavía no hay clientes. Puedes crear el primero desde Operaciones.</p> : registro.clientes
+  .filter((cliente) =>
+    cliente.nombre.toLowerCase().includes(
+      busquedaCliente.trim().toLowerCase()
+    )
+  )
+  .map((cliente) => <article className="customer" key={cliente.direccion}>
             <header><div><strong>{cliente.nombre}</strong><span className="small-note">Cliente #{cliente.idCliente} · {cliente.compras} ventas activas</span></div><button className="text-button" disabled={ocupado} onClick={() => { setIdCliente(String(cliente.idCliente)); setOp('venta'); }}>Seleccionar</button></header>
             {cliente.ventas.length === 0 ? <p className="empty-line">Sin ventas activas.</p> : <div className="table-wrap"><table><thead><tr><th>SKU</th><th>Descripción</th><th className="numeric">Importe</th></tr></thead><tbody>{cliente.ventas.map((venta) => <tr key={venta.direccion} onClick={() => { if (!ocupado) { setIdCliente(String(cliente.idCliente)); setSku(venta.sku); setMonto(String(venta.monto)); setOp('monto'); } }}><td><code>{venta.sku}</code></td><td>{venta.descripcion}</td><td className="numeric">{venta.monto.toLocaleString('es-MX')} <small>{UNIDAD_MONTO}</small></td></tr>)}</tbody></table></div>}
           </article>)}
